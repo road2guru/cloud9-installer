@@ -50,7 +50,7 @@ for i in `egrep -l "env\.HOME\>" $INSTALL_PATH -R | grep -E '\.js$|\.sh$|\.rc$'`
 do
     echo $i
     rm -f "$(dirname ${i}.swp)*.swp"
-	vim -c '%s/env.HOME\>/env.C9_DIR/g | wq' $i
+    vim -c '%s/env.HOME\>/env.C9_DIR/g | wq' $i
 done
 
 cat << EOF > $INSTALL_PATH/bin/run.sh
