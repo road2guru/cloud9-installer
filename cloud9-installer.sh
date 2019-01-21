@@ -29,6 +29,7 @@ fi
 #
 # install scripts, by default set th install path to ~/.c9 - let's change it
 #
+echo "== patching $INSTALL_PATH/scripts/install-sdk.sh"
 vim -c '%s/ bash\>/ bash -s - -d $BIN_PATH/g | wq'          $INSTALL_PATH/scripts/install-sdk.sh
 vim -c '%s/\~/$INSTALL_PATH/g | wq'                         $INSTALL_PATH/scripts/install-sdk.sh
 vim -c '%s/C9_DIR="$HOME"/C9_DIR="$INSTALL_PATH"/g | wq'    $INSTALL_PATH/scripts/install-sdk.sh
@@ -48,7 +49,7 @@ fi
 #
 for i in `egrep -l "env\.HOME\>" $INSTALL_PATH -R | grep -E '\.js$|\.sh$|\.rc$'`
 do
-    echo $i
+    echo "== patching $i"
     rm -f "$(dirname ${i}.swp)*.swp"
     vim -c '%s/env.HOME\>/env.C9_DIR/g | wq' $i
 done
