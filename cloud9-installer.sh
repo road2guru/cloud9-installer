@@ -6,7 +6,7 @@ LOG_FILE=installation.log
 
 echo -n "Enter installation path, default ($INSTALL_PATH): "
 read custom_path
-if [ -d "$custom_path" ]
+if [ ! -z "$custom_path" ]
 then
 	INSTALL_PATH=$custom_path
 fi
