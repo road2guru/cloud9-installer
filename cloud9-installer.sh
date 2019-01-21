@@ -1,7 +1,6 @@
 #!/bin/bash
 
 INSTALL_PATH=${1:-$HOME}/c9sdk
-BIN_PATH=$INSTALL_PATH/.c9
 LOG_FILE=installation.log
 
 echo -n "Enter installation path, default ($INSTALL_PATH): "
@@ -10,8 +9,10 @@ if [ ! -z "$custom_path" ]
 then
 	INSTALL_PATH=$custom_path
 fi
-	
+
 echo "=== install path $INSTALL_PATH"
+echo -n "Press Enter to continue the installation or CTRL + C to cancel: "
+read
 
 #
 # get the core path
@@ -26,20 +27,24 @@ fi
     git fetch >> $LOG_FILE
 )
 
+BIN_PATH=$INSTALL_PATH/.c9
 #
 # install scripts, by default set th install path to ~/.c9 - let's change it
 #
-echo "== patching $INSTALL_PATH/scripts/install-sdk.sh"
+echo "=== patching $INSTALL_PATH/scripts/install-sdk.sh"
 vim -c '%s/ bash\>/ bash -s - -d $BIN_PATH/g | wq'          $INSTALL_PATH/scripts/install-sdk.sh
 vim -c '%s/\~/$INSTALL_PATH/g | wq'                         $INSTALL_PATH/scripts/install-sdk.sh
 vim -c '%s/C9_DIR="$HOME"/C9_DIR="$INSTALL_PATH"/g | wq'    $INSTALL_PATH/scripts/install-sdk.sh
 vim -c '%s/updateCore /\# updateCore /g | wq'               $INSTALL_PATH/scripts/install-sdk.sh
 
+# sometime BIN_PATH & INSTALL_PATH was not able to correcly detected, trace out for further debugging
+echo "BIN_PATH=$BIN_PATH INSTALL_PATH=$INSTALL_PATH $INSTALL_PATH/scripts/install-sdk.sh" | tee -a $LOG_FILE
+
 #
 # start installation
 #
 if [ $? -eq 0 ]; then
-    BIN_PATH=$BIN_PATH INSTALL_PATH=$INSTALL_PATH $INSTALL_PATH/scripts/install-sdk.sh >> $LOG_FILE
+    BIN_PATH=$BIN_PATH INSTALL_PATH=$INSTALL_PATH $INSTALL_PATH/scripts/install-sdk.sh | tee -a $LOG_FILE
 else
     echo "Error! unable to continue! check $LOG_FILE for more detail."
 fi
@@ -49,7 +54,7 @@ fi
 #
 for i in `egrep -l "env\.HOME\>" $INSTALL_PATH -R | grep -E '\.js$|\.sh$|\.rc$'`
 do
-    echo "== patching $i"
+    echo "=== patching $i"
     rm -f "$(dirname ${i}.swp)*.swp"
     vim -c '%s/env.HOME\>/env.C9_DIR/g | wq' $i
 done
